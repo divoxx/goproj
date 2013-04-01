@@ -16,25 +16,19 @@ directory and setting `GO_PATH` to that folder prior to delegating the call to t
 For example, given the following folder structure.
 
 ```
-- projects
-  +- foo
-    +- .gopath
-    +- bin
-    +- pkg
-    +- src
-      +- github.com
-        +- divoxx
-          +- foo
-            +- foo.go
-            +- foo_test.go
-  +- bar
-    +- ...
-  +- baz
-    +- ...
+-- projects
+  |- foo
+    |- .gopath
+    |- src
+      |- github.com
+        |- divoxx
+          |- foo
+            |- foo.go
+            |- foo_test.go
 ```
 
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
-looking for the first .gopath location, set `GO_PATH` to that folder and delegate to the original go tool.
+looking for the first .gopath location, set `GO_PATH="/projects/foo"` and delegate to the original go tool.
 
 The content of `.gopath` is irrelevant, it's recommended to simply `touch .gopath`.
 
