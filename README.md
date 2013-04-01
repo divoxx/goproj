@@ -38,9 +38,9 @@ For example, given the following folder structure.
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
 looking for the first .gopath location, set `GOPATH="/projects/foo"` and delegate to the original go tool.
 
-The content of `.gopath` is irrelevant, it's recommended to simply `touch .gopath`.
+The content of `.goproj` is irrelevant, it's recommended to simply `touch .goproj`.
 
-In case a `.gopath` is not found, the wrapper won't touch the `GOPATH` env variable and will just delegate
+In case a `.goproj` is not found, the wrapper won't touch the `GOPATH` env variable and will just delegate
 to go tool.
 
 Installation
