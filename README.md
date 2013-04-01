@@ -48,17 +48,13 @@ Installation
 For now, the easiest way of installing it is by cloning the repository, prepending the repo's `bin/` folder to 
 the `PATH` env variable and setting the `GOTOOL` env variable with the go tool's absolute path.
 
-If you're on linux, you can copy & paste this (line breaks in `cat` are important):
+If you're on linux, you can copy & paste this (line break in `cat` is important if file doesn't have a leading linebreak):
 
 ```
 git clone git://github.com/divoxx/goproj
 cd goproj
-
-
 cat <<EOF >> ~/.bashrc && source ~/.bashrc
 
-
-# -- Configure GoProj
 export GOTOOL="$(which go)"
 export PATH="$(pwd)/bin:\${PATH}"
 EOF
@@ -69,11 +65,8 @@ On MacOSX, replace `~/.bashrc` with `~/.bash_profile`:
 ```
 git clone git://github.com/divoxx/goproj
 cd goproj
-
 cat <<EOF >> ~/.bash_profile && source ~/.bash_profile
 
-
-# -- Configure GoProj
 export GOTOOL="$(which go)"
 export PATH="$(pwd)/bin:\${PATH}"
 EOF
