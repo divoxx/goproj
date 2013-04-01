@@ -7,6 +7,7 @@ What is it?
 Automatially manage Go(lang) project workspaces by looking for a `.goproj` file up in the tree and setting
 `GOPATH` to it's location.
 
+A very complicated project composed of 29 lines of code :-)
 
 Introduction
 ------------
