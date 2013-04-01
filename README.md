@@ -1,6 +1,13 @@
 GoProj
 ======
 
+What is it?
+-----------
+
+Automatially manage Go(lang) projects workspaces by looking for a .goproj file up in the tree and setting
+`GOPATH` to it's location.
+
+
 Introduction
 ------------
 
