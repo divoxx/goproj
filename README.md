@@ -50,7 +50,7 @@ the `PATH` env variable and setting the `GOTOOL` env variable with the go tool's
 
 If you're on linux, you can copy & paste this (line break in `cat` is important if file doesn't have a leading linebreak):
 
-```
+```bash
 git clone git://github.com/divoxx/goproj
 cd goproj
 cat <<EOF >> ~/.bashrc && source ~/.bashrc
@@ -62,7 +62,7 @@ EOF
 
 On MacOSX, replace `~/.bashrc` with `~/.bash_profile`:
 
-```
+```bash
 git clone git://github.com/divoxx/goproj
 cd goproj
 cat <<EOF >> ~/.bash_profile && source ~/.bash_profile
