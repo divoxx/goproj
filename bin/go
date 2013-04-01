@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ ! $GOTOOL ]]; then
+  echo "\$GOTOOL is not set, please set it with go tool's absolute path, i.e. export \$GOTOOL=\"/usr/local/bin/go\""
+  exit 1
+fi
+
 locate_goproj_dir() {
   local dir=$1
 
@@ -21,4 +26,4 @@ if [[ $? -eq 0 ]]; then
   GOPATH="${goproj_dir}"
 fi
 
-$go_tool $@
+${GOTOOL} ${@}
