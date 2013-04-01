@@ -16,21 +16,21 @@ directory and setting `GO_PATH` to that folder prior to delegating the call to t
 For example, given the following folder structure.
 
 ```
-+- projects
+- projects
   +- foo
-     +- .gopath
-     +- bin
-     +- pkg
-     +- src
-        +- github.com
-           +- divoxx
-              +- foo
-                 +- foo.go
-                 +- foo_test.go
+    +- .gopath
+    +- bin
+    +- pkg
+    +- src
+      +- github.com
+        +- divoxx
+          +- foo
+            +- foo.go
+            +- foo_test.go
   +- bar
-     +- bin
-     +- pkg
-     +- src
+    +- ...
+  +- baz
+    +- ...
 ```
 
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
@@ -38,13 +38,16 @@ looking for the first .gopath location, set `GO_PATH` to that folder and delegat
 
 The content of `.gopath` is irrelevant, it's recommended to simply `touch .gopath`.
 
+In case a `.gopath` is not found, the wrapper won't touch the `GO_PATH` env variable and will just delegate
+to go tool.
+
 Installation
 ------------
 
-For now, the easiest way of installing it is by cloning the repository, and setting `PATH` and `GO_TOOL`
-properly. 
+For now, the easiest way of installing it is by cloning the repository, adding the repos `bin/` folder to 
+the `PATH` env variable and setting `GO_TOOL` with the go tool absolute path.
 
-If you're on linux:
+If you're on linux, you can copy & paste this:
 
 ```
 git clone git://github.com/divoxx/goproj
