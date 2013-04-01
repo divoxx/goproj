@@ -12,14 +12,14 @@ A very complicated project composed of 29 lines of code :-)
 Introduction
 ------------
 
-Simple wrapper around Go(lang) build tool that simplify having project-specific `GO_PATH` configurations.
+Simple wrapper around Go(lang) build tool that simplify having project-specific `GOPATH` configurations.
 
 Because of the way `go get` works and how dependencies are managed, ideally, each project would have it's 
-own workspace (GO_PATH) where it's source code and dependencies would exist isolated from other projects.
-Managing `GO_PATH` can be a pain though.
+own workspace (GOPATH) where it's source code and dependencies would exist isolated from other projects.
+Managing `GOPATH` can be a pain though.
 
 GoProj try to solve this by wrapping the go executable, looking for a `.goproj` file up from the current
-directory and setting `GO_PATH` to that folder prior to delegating the call to the go tool.
+directory and setting `GOPATH` to that folder prior to delegating the call to the go tool.
 
 For example, given the following folder structure.
 
@@ -36,11 +36,11 @@ For example, given the following folder structure.
 ```
 
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
-looking for the first .gopath location, set `GO_PATH="/projects/foo"` and delegate to the original go tool.
+looking for the first .gopath location, set `GOPATH="/projects/foo"` and delegate to the original go tool.
 
 The content of `.gopath` is irrelevant, it's recommended to simply `touch .gopath`.
 
-In case a `.gopath` is not found, the wrapper won't touch the `GO_PATH` env variable and will just delegate
+In case a `.gopath` is not found, the wrapper won't touch the `GOPATH` env variable and will just delegate
 to go tool.
 
 Installation
