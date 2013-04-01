@@ -1,0 +1,24 @@
+#!/bin/bash
+
+locate_goproj_dir() {
+  local dir=$1
+
+  while [ $dir != "/" ]; do
+    if [[ -e "${dir}/.goproj" ]]; then
+      echo -n "${dir}"
+      return 0
+    fi
+
+    dir=$(dirname "${dir}")
+  done
+
+  return 1
+}
+
+goproj_dir=$(locate_goproj_dir "$(pwd)")
+
+if [[ $? -eq 0 ]]; then
+  GOPATH="${goproj_dir}"
+fi
+
+$go_tool $@
