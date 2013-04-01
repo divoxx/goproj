@@ -26,7 +26,7 @@ For example, given the following folder structure.
 ```
 -- projects
   |- foo
-    |- .gopath
+    |- .goproj
     |- src
       |- github.com
         |- divoxx
@@ -36,7 +36,7 @@ For example, given the following folder structure.
 ```
 
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
-looking for the first .gopath location, set `GOPATH="/projects/foo"` and delegate to the original go tool.
+looking for the first `.goproj` location, set `GOPATH="/projects/foo"` and delegate to the original go tool.
 
 The content of `.goproj` is irrelevant, it's recommended to simply `touch .goproj`.
 
