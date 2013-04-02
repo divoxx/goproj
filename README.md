@@ -5,7 +5,7 @@ What is it?
 -----------
 
 Automatially manage Go(lang) project workspaces by looking for a `.goproj` file up in the tree and setting
-`GOPATH` to it's location.
+prepending it's location to the `GOPATH` env variable.
 
 A very complicated project composed of 29 lines of code :-)
 
@@ -19,7 +19,7 @@ own workspace (GOPATH) where it's source code and dependencies would exist isola
 Managing `GOPATH` can be a pain though.
 
 GoProj try to solve this by wrapping the go executable, looking for a `.goproj` file up from the current
-directory and setting `GOPATH` to that folder prior to delegating the call to the go tool.
+directory and prepending it's location to the `GOPATH` env variable prior to delegating the call to the go tool.
 
 For example, given the following folder structure.
 
@@ -36,7 +36,7 @@ For example, given the following folder structure.
 ```
 
 If you run `go build` from inside `projects/src/github.com/divoxx/foo`, the wrapper will go up the path
-looking for the first `.goproj` location, set `GOPATH="/projects/foo"` and delegate to the original go tool.
+looking for the first `.goproj` location, set `GOPATH="/projects/foo:${GOPATH}"` and delegate to the original go tool.
 
 The content of `.goproj` is irrelevant, it's recommended to simply `touch .goproj`.
 
