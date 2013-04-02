@@ -8,7 +8,7 @@ fi
 locate_goproj_dir() {
   local dir=$1
 
-  while [ $dir != "/" ]; do
+  while [[ $dir != "/" ]]; do
     if [[ -e "${dir}/.goproj" ]]; then
       echo -n "${dir}"
       return 0
