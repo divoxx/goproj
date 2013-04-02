@@ -23,7 +23,8 @@ locate_goproj_dir() {
 goproj_dir=$(locate_goproj_dir "$(pwd)")
 
 if [[ $? -eq 0 ]]; then
-  GOPATH="${goproj_dir}"
+  orig_gopath=$(${GOTOOL} env GOPATH)
+  GOPATH="${goproj_dir}:${orig_gopath}"
 fi
 
 ${GOTOOL} ${@}
