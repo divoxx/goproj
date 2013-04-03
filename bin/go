@@ -5,26 +5,4 @@ if [[ ! $GOTOOL ]]; then
   exit 1
 fi
 
-locate_goproj_dir() {
-  local dir=$1
-
-  while [[ $dir != "/" ]]; do
-    if [[ -e "${dir}/.goproj" ]]; then
-      echo -n "${dir}"
-      return 0
-    fi
-
-    dir=$(dirname "${dir}")
-  done
-
-  return 1
-}
-
-goproj_dir=$(locate_goproj_dir "$(pwd)")
-
-if [[ $? -eq 0 ]]; then
-  orig_gopath=$(${GOTOOL} env GOPATH)
-  GOPATH="${goproj_dir}:${orig_gopath}"
-fi
-
-${GOTOOL} ${@}
+goproj -c ${GOTOOL} -- ${@}

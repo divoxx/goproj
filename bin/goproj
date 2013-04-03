@@ -1,0 +1,101 @@
+#!/bin/bash -i
+
+show_help() {
+  echo "Usage: $(basename ${0}) [ -h | -c COMMAND | -s ] [ -x ] -- ARGS"
+  echo ""
+  echo "Search for a .goproj file up in the directory tree. If it finds one,"
+  echo "prepend it's directory to the GOPATH env variable. After finding a file"
+  echo "or reaching your root folder (usually \"/\"), it executes the given command."
+  echo ""
+  echo "Options:"
+  echo "  -h    show this screen"
+  echo "  -c    setup GOPATH and run COMMAND"
+  echo "  -s    open a new shell with GOPATH set"
+  echo "        shortcut to 'goproj -c \${SHELL}'"
+  echo "  -x    set GOPATH strictly to your project path instead of appending"
+  echo "        skipping the search for pkgs in the original GOPATH folder"
+  echo ""
+  echo "Any ARGS provided after the -- will be passed as is to the command or shell."
+  echo ""
+  echo "Examples:"
+  echo ""
+  echo "  goproj -c godoc -http=:6060"
+  echo "  goproj -s"
+  echo ""
+  echo "PROTIP: goproj contains a wrapper to the go tool which automatically setup"
+  echo "GOPATH and execute the go tool command properly. So, one can easily do:"
+  echo ""
+  echo "  go build -a -n"
+  echo ""
+  echo "And it will be the same as:"
+  echo ""
+  echo "  goproj -c go -- build -a -n"
+  echo ""
+}
+
+locate_goproj_dir() {
+  local dir="$(pwd)"
+
+  while [[ $dir != "/" ]]; do
+    if [[ -e "${dir}/.goproj" ]]; then
+      echo -n "${dir}"
+      return 0
+    fi
+
+    dir=$(dirname "${dir}")
+  done
+
+  return 1
+}
+
+setup_gopath() {
+  goproj_path=$(locate_goproj_dir)
+  if [[ $? -eq 0 ]]; then  
+    if [[ $EXCLUSIVE ]]; then
+      GOPATH="${goproj_path}"
+    else  
+      GOPATH="${goproj_path}:${GOPATH}"
+    fi
+  fi
+}
+
+while getopts ":hxsc:" opt; do
+  case $opt in
+  "h")
+    show_help
+    exit 1
+    ;;
+  "x")
+    EXCLUSIVE=true
+    ;;
+  "s")
+    RUN_SHELL=true
+    ;;
+  "c")
+    CMD="${OPTARG}"
+    ;;
+  ?)
+    echo "Err: Invalid option ${OPTARG}."
+    echo ""
+    show_help
+    exit 1
+    ;;
+  esac
+done
+
+shift $(( OPTIND - 1 ));
+
+setup_gopath
+
+if [[ $CMD ]]; then
+  $CMD $@
+  exit 0
+fi
+
+if [[ $RUN_SHELL ]]; then
+  ${SHELL} $@
+  exit 0
+fi
+
+show_help
+exit 1
