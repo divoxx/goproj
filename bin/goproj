@@ -19,7 +19,7 @@ show_help() {
   echo ""
   echo "Examples:"
   echo ""
-  echo "  goproj -c godoc -http=:6060"
+  echo "  goproj -c godoc -- -http=:6060"
   echo "  goproj -s"
   echo ""
   echo "PROTIP: goproj contains a wrapper to the go tool which automatically setup"

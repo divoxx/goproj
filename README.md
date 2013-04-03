@@ -105,7 +105,7 @@ Any ARGS provided after the -- will be passed as is to the command or shell.
 
 Examples:
 
-  goproj -c godoc -http=:6060
+  goproj -c godoc -- -http=:6060
   goproj -s
 
 PROTIP: goproj contains a wrapper to the go tool which automatically setup
