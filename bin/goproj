@@ -1,35 +1,45 @@
 #!/bin/bash -i
 
+VERSION="0.1.0"
+
 show_help() {
-  echo "Usage: $(basename ${0}) [ -h | -c COMMAND | -s ] [ -x ] -- ARGS"
-  echo ""
-  echo "Search for a .goproj file up in the directory tree. If it finds one,"
-  echo "prepend it's directory to the GOPATH env variable. After finding a file"
-  echo "or reaching your root folder (usually \"/\"), it executes the given command."
+  echo "Usage: $(basename ${0}) [options] [--] COMMAND"
   echo ""
   echo "Options:"
   echo "  -h    show this screen"
-  echo "  -c    setup GOPATH and run COMMAND"
-  echo "  -s    open a new shell with GOPATH set"
-  echo "        shortcut to 'goproj -c \${SHELL}'"
-  echo "  -x    set GOPATH strictly to your project path instead of appending"
-  echo "        skipping the search for pkgs in the original GOPATH folder"
+  echo "  -x    set GOPATH strictly to your project path, not keeping the original"
+  echo "  -s    open a new shell with the environment setup to the project"
+  echo "  -v    show the version"
   echo ""
-  echo "Any ARGS provided after the -- will be passed as is to the command or shell."
+  echo "Description:"
+  echo ""
+  echo "  Search for a .goproj file up in the directory tree. If one is found, prepend"
+  echo "  it's directory to the GOPATH env variable and execute COMMAND."
+  echo ""
+  echo "  If no .goproj file is found, it stops when it reaches the root folder, and"
+  echo "  executes COMMAND"
   echo ""
   echo "Examples:"
   echo ""
-  echo "  goproj -c godoc -- -http=:6060"
+  echo "  goproj godoc -http=:6060"
   echo "  goproj -s"
   echo ""
-  echo "PROTIP: goproj contains a wrapper to the go tool which automatically setup"
-  echo "GOPATH and execute the go tool command properly. So, one can easily do:"
+  echo "Go tool wrapper:"
   echo ""
-  echo "  go build -a -n"
+  echo "  goproj comes with the goproj-go executable, which wraps the go tool, setting up"
+  echo "  the environment prior to actually executing the toolchain command."
   echo ""
-  echo "And it will be the same as:"
+  echo "  To take full advantage of it, it's recommended to alias the \"go\" command to it:"
   echo ""
-  echo "  goproj -c go -- build -a -n"
+  echo "    alias go=\"goproj-go\""
+  echo ""
+  echo "  After setting the alias, one can simply do:"
+  echo ""
+  echo "    go build -a -n"
+  echo ""
+  echo "  And it will in fact execute:"
+  echo ""
+  echo "    goproj -- go build -a -n"
   echo ""
 }
 
@@ -48,18 +58,28 @@ locate_goproj_dir() {
   return 1
 }
 
-setup_gopath() {
-  goproj_path=$(locate_goproj_dir)
-  if [[ $? -eq 0 ]]; then  
+setup_env() {
+  local goproj_path=$(locate_goproj_dir)
+
+  if [[ -n $goproj_path ]]; then
+    local goproj_name=$(basename ${goproj_path})
+    PS1="\[\033[1;36m\]goproj:${goproj_name}\[\033[0m\] ${PS1}"
+
     if [[ $EXCLUSIVE ]]; then
       GOPATH="${goproj_path}"
     else  
       GOPATH="${goproj_path}:${GOPATH}"
     fi
+
+    PATH="${GOPATH//://bin:}/bin:${PATH}"
+
+    return 0
   fi
+
+  return 1
 }
 
-while getopts ":hxsc:" opt; do
+while getopts ":hxsv" opt; do
   case $opt in
   "h")
     show_help
@@ -71,8 +91,9 @@ while getopts ":hxsc:" opt; do
   "s")
     RUN_SHELL=true
     ;;
-  "c")
-    CMD="${OPTARG}"
+  "v")
+    echo $VERSION
+    exit 0
     ;;
   ?)
     echo "Err: Invalid option ${OPTARG}."
@@ -85,15 +106,19 @@ done
 
 shift $(( OPTIND - 1 ));
 
-setup_gopath
+setup_env
 
-if [[ $CMD ]]; then
-  $CMD $@
+if [[ $RUN_SHELL ]]; then
+  if [[ $? -ne 0 ]]; then
+    echo "No .goproj found, not starting shell"
+  fi
+
+  ${SHELL} $@
   exit 0
 fi
 
-if [[ $RUN_SHELL ]]; then
-  ${SHELL} $@
+if [[ -n $@ ]]; then
+  $@
   exit 0
 fi
 

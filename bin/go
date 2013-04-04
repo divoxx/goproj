@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [[ ! $GOTOOL ]]; then
-  echo "\$GOTOOL is not set, please set it with go tool's absolute path, i.e. export \$GOTOOL=\"/usr/local/bin/go\""
-  exit 1
-fi
-
-goproj -c ${GOTOOL} -- ${@}

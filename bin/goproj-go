@@ -1,0 +1,4 @@
+#!/bin/bash
+
+GOTOOL=$(which go)
+goproj -- ${GOTOOL} ${@}
