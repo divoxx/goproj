@@ -11,31 +11,31 @@ Installation
 
 1. Clone the repository
 
-   ```
+   ```bash
    git clone git://github.com/divoxx/goproj
    ```
 
 3. Enter the project folder
 
-   ```
+   ```bash
    cd goproj
    ```
 
 2. Add the `bin/` folder to your PATH
 
-   ```
+   ```bash
    echo "export PATH=\"$(pwd)/bin:${PATH}\"" >> ~/.bashrc
    ```
 
 3. Alias the `go` command to the `goproj-go` executable:
 
-   ```
+   ```bash
    echo "alias go=\"goproj-go\"" >> ~/.bashrc
    ```
 
 4. Optionaly reload your bashrc
 
-   ```
+   ```bash
    source ~/.bashrc
    ```
    
