@@ -63,9 +63,6 @@ Any go command that you run from whithin that `~/projects/foo`, or any subdirect
 be prepended to $GOPATH, properly resolving any dependencies during the build process. Also, if you `go get` 
 or `go install` something, it will be installed inside that folder.
 
-Usage
------
-
 ```
 Usage: goproj [options] [--] COMMAND
 
