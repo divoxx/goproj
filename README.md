@@ -4,7 +4,7 @@ GoProj
 What is it?
 -----------
 
-Automatially manage Go(lang) project workspaces by looking for a `.goproj` file up in the tree and setting
+Automatially manage Go(lang) project workspaces by looking for a `.goproj` file up in the tree and
 prepending it's location to the `GOPATH` env variable.
 
 Introduction
