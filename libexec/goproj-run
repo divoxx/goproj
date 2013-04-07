@@ -1,0 +1,117 @@
+#!/bin/bash -i
+
+usage() {
+  echo "Usage: goproj run [*options] [--] COMMAND"
+  echo ""
+  echo "Options:"
+  echo "  -x    set GOPATH strictly to your project path, not keeping the original"
+  echo "  -s    open a new shell with the environment setup to the project"
+  echo ""
+  echo "Description:"
+  echo ""
+  echo "  Search for a .goproj file up in the directory tree. If one is found, prepend"
+  echo "  it's directory to the GOPATH env variable and execute COMMAND."
+  echo ""
+  echo "  If no .goproj file is found, it stops when it reaches the root folder, and"
+  echo "  executes COMMAND"
+  echo ""
+  echo "Examples:"
+  echo ""
+  echo "  goproj godoc -http=:6060"
+  echo "  goproj -s"
+  echo ""
+  echo "Go tool wrapper:"
+  echo ""
+  echo "  goproj comes with the goproj-go executable, which wraps the go tool, setting up"
+  echo "  the environment prior to actually executing the toolchain command."
+  echo ""
+  echo "  To take full advantage of it, it's recommended to alias the \"go\" command to it:"
+  echo ""
+  echo "    alias go=\"goproj-go\""
+  echo ""
+  echo "  After setting the alias, one can simply do:"
+  echo ""
+  echo "    go build -a -n"
+  echo ""
+  echo "  And it will in fact execute:"
+  echo ""
+  echo "    goproj -- go build -a -n"
+  echo ""
+}
+
+locate_goproj_dir() {
+  local dir="$(pwd)"
+
+  while [[ $dir != "/" ]]; do
+    if [[ -e "${dir}/.goproj" ]]; then
+      echo -n "${dir}"
+      return 0
+    fi
+
+    dir=$(dirname "${dir}")
+  done
+
+  return 1
+}
+
+setup_env() {
+  local goproj_path=$(locate_goproj_dir)
+
+  if [[ -n $goproj_path ]]; then
+    local goproj_name=$(basename ${goproj_path})
+    PS1="\[\033[1;36m\]goproj:${goproj_name}\[\033[0m\] ${PS1}"
+
+    if [[ $EXCLUSIVE ]]; then
+      GOPATH="${goproj_path}"
+    else  
+      GOPATH="${goproj_path}:${GOPATH}"
+    fi
+
+    PATH="${GOPATH//://bin:}/bin:${PATH}"
+
+    return 0
+  fi
+
+  return 1
+}
+
+while getopts ":xs" opt; do
+  case $opt in
+  "x")
+    EXCLUSIVE=true
+    ;;
+  "s")
+    RUN_SHELL=true
+    ;;
+  ?)
+    echo "Err: Invalid option ${OPTARG}."
+    echo ""
+    usage
+    exit 1
+    ;;
+  esac
+done
+
+shift $(( OPTIND - 1 ));
+
+if [[ $RUN_SHELL ]]; then
+  setup_env
+
+  if [[ $? -ne 0 ]]; then
+    echo "No .goproj found, not starting shell"
+    exit 1
+  fi
+
+  ${SHELL} -i
+  exit 0
+fi
+
+if [[ -n $@ ]]; then
+  setup_env
+
+  $@
+  exit 0
+fi
+
+usage
+exit 1
