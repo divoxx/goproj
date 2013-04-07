@@ -2,3 +2,4 @@
 
 GOTOOL=$(which go)
 goproj -- ${GOTOOL} ${@}
+exit $?

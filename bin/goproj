@@ -114,12 +114,12 @@ if [[ $RUN_SHELL ]]; then
   fi
 
   ${SHELL} $@
-  exit 0
+  exit $?
 fi
 
 if [[ -n $@ ]]; then
   $@
-  exit 0
+  exit $?
 fi
 
 show_help
