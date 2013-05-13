@@ -4,22 +4,19 @@ VERSION="0.1.0"
 
 usage() {
   cat <<EOF
-Usage: goproj COMMAND [*options]
+Usage: goproj COMMAND [options*]
 
-Simplify Go(lang) development by providing a set of tools built around the 
+Simplify Go(lang) development by providing a set of tools built around the
 original go tool.
 
 Commands:
 
-  new     Creates a new project structure.
-  run     Run the a given command with GOPATH set to the project directory.
-  go      Wraps the go tool, setting GOPATH prior to executing it.
-  help    Show more information about a command, the argument being another
-          command.
+    new     Creates a new project structure.
+    run     Run the a given command with GOPATH set to the project directory.
 
-For more information, use go help:
+Examples:
 
-  go help COMMAND
+    goproj new
 
 EOF
 }
@@ -36,13 +33,14 @@ run() {
     usage
     exit 0
   else
-    local bin="$(libexec)/$(basename $0)-${cmd}"
+    local bin="$(basename $0)-${cmd}"
+    PATH="$(libexec):${PATH}"
 
     if which $bin > /dev/null; then
       shift
       $bin $@
     else
-      echo -e "ERR: Unknown command ${cmd}\n"
+      echo -e "Invalid command: ${cmd}\n"
       usage
       exit 1
     fi

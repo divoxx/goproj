@@ -3,41 +3,39 @@
 usage() {
   echo "Usage: goproj run [*options] [--] COMMAND"
   echo ""
+  echo "Setup Go(lang) environment variables for your project prior to execute the given command."
+  echo ""
   echo "Options:"
-  echo "  -x    set GOPATH strictly to your project path, not keeping the original"
-  echo "  -s    open a new shell with the environment setup to the project"
+  echo "    -x  Set GOPATH exclusively to your project path, reseting it instead of prepending to it"
   echo ""
-  echo "Description:"
+  echo "How it works:"
+  echo "    Search for a .goproj file up in the directory tree. If one is found, prepend"
+  echo "    it's directory to the GOPATH env variable and execute COMMAND."
   echo ""
-  echo "  Search for a .goproj file up in the directory tree. If one is found, prepend"
-  echo "  it's directory to the GOPATH env variable and execute COMMAND."
-  echo ""
-  echo "  If no .goproj file is found, it stops when it reaches the root folder, and"
-  echo "  executes COMMAND"
+  echo "    If no .goproj file is found, it stops when it reaches the root folder, and"
+  echo "    executes COMMAND"
   echo ""
   echo "Examples:"
+  echo "    goproj run godoc -http=:6060"
   echo ""
-  echo "  goproj godoc -http=:6060"
-  echo "  goproj -s"
+  echo "Pro Tip:"
+  echo "    You can use an alias trick to make wrap the go tool to always use goproj to setup env variables"
+  echo "    for your project."
   echo ""
-  echo "Go tool wrapper:"
+  echo "        alias go=\"goproj run -- go\""
   echo ""
-  echo "  goproj comes with the goproj-go executable, which wraps the go tool, setting up"
-  echo "  the environment prior to actually executing the toolchain command."
+  echo "    After setting the alias, one can simply do:"
   echo ""
-  echo "  To take full advantage of it, it's recommended to alias the \"go\" command to it:"
+  echo "        go build -a -n"
   echo ""
-  echo "    alias go=\"goproj-go\""
+  echo "    And it will in fact execute:"
   echo ""
-  echo "  After setting the alias, one can simply do:"
-  echo ""
-  echo "    go build -a -n"
-  echo ""
-  echo "  And it will in fact execute:"
-  echo ""
-  echo "    goproj -- go build -a -n"
+  echo "        goproj run -- go build -a -n"
   echo ""
 }
+
+# options
+opt_x=false
 
 locate_goproj_dir() {
   local dir="$(pwd)"
@@ -58,12 +56,9 @@ setup_env() {
   local goproj_path=$(locate_goproj_dir)
 
   if [[ -n $goproj_path ]]; then
-    local goproj_name=$(basename ${goproj_path})
-    PS1="\[\033[1;36m\]goproj:${goproj_name}\[\033[0m\] ${PS1}"
-
-    if [[ $EXCLUSIVE ]]; then
+    if [[ $opt_h ]]; then
       GOPATH="${goproj_path}"
-    else  
+    else
       GOPATH="${goproj_path}:${GOPATH}"
     fi
 
@@ -75,43 +70,28 @@ setup_env() {
   return 1
 }
 
-while getopts ":xs" opt; do
-  case $opt in
-  "x")
-    EXCLUSIVE=true
-    ;;
-  "s")
-    RUN_SHELL=true
-    ;;
-  ?)
-    echo "Err: Invalid option ${OPTARG}."
-    echo ""
-    usage
-    exit 1
-    ;;
+args=`getopt x $*`
+if [ $? != 0 ]
+then
+  usage
+  exit 2
+fi
+
+set -- $args
+
+for i; do
+  case "${i}" in
+  "-x")
+    opt_x=true; shift;;
+  "--")
+    shift; break;;
   esac
 done
 
-shift $(( OPTIND - 1 ));
-
-if [[ $RUN_SHELL ]]; then
-  setup_env
-
-  if [[ $? -ne 0 ]]; then
-    echo "No .goproj found, not starting shell"
-    exit 1
-  fi
-
-  ${SHELL} -i
+if [[ -z $@ ]]; then
+  usage
   exit 0
 fi
 
-if [[ -n $@ ]]; then
-  setup_env
-
-  $@
-  exit 0
-fi
-
-usage
-exit 1
+setup_env
+$@
