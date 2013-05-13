@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+usage() {
+  cat <<EOF
+Usage: goproj init [-]
+
+Initialize the environment for goproj.
+Add this to your ~/.bashrc or ~/.bash_profile
+
+eval "\$(goproj init -)"
+EOF
+}
+
+if [[ -z $1 ]]; then
+  usage
+  exit 0
+fi
+
+if [[ $1 != '-' ]]; then
+  usage
+  exit 2
+fi
+
+cat <<EOF
+alias go="${GOPROJ_PREFIX}/bin/goproj run -- go"
+EOF

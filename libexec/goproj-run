@@ -1,37 +1,40 @@
 #!/bin/bash -i
+set -e
 
 usage() {
-  echo "Usage: goproj run [*options] [--] COMMAND"
-  echo ""
-  echo "Setup Go(lang) environment variables for your project prior to execute the given command."
-  echo ""
-  echo "Options:"
-  echo "    -x  Set GOPATH exclusively to your project path, reseting it instead of prepending to it"
-  echo ""
-  echo "How it works:"
-  echo "    Search for a .goproj file up in the directory tree. If one is found, prepend"
-  echo "    it's directory to the GOPATH env variable and execute COMMAND."
-  echo ""
-  echo "    If no .goproj file is found, it stops when it reaches the root folder, and"
-  echo "    executes COMMAND"
-  echo ""
-  echo "Examples:"
-  echo "    goproj run godoc -http=:6060"
-  echo ""
-  echo "Pro Tip:"
-  echo "    You can use an alias trick to make wrap the go tool to always use goproj to setup env variables"
-  echo "    for your project."
-  echo ""
-  echo "        alias go=\"goproj run -- go\""
-  echo ""
-  echo "    After setting the alias, one can simply do:"
-  echo ""
-  echo "        go build -a -n"
-  echo ""
-  echo "    And it will in fact execute:"
-  echo ""
-  echo "        goproj run -- go build -a -n"
-  echo ""
+  cat <<EOF
+Usage: goproj run [options] <command>
+
+Setup Go(lang) environment variables for your project prior to execute the given command.
+
+Options:
+    -x  Set GOPATH exclusively to your project path, reseting it instead of prepending to it
+
+How it works:
+    Search for a .goproj file up in the directory tree. If one is found, prepend
+    it's directory to the GOPATH env variable and execute COMMAND.
+
+    If no .goproj file is found, it stops when it reaches the root folder, and
+    executes COMMAND
+
+Examples:
+    goproj run godoc -http=:6060
+
+Pro Tip:
+    You can use an alias trick to make wrap the go tool to always use goproj to setup env variables
+    for your project.
+
+        alias go="goproj run -- go"
+
+    After setting the alias, one can simply do:
+
+        go build -a -n
+
+    And it will in fact execute:
+
+        goproj run -- go build -a -n
+
+EOF
 }
 
 # options
@@ -63,11 +66,7 @@ setup_env() {
     fi
 
     PATH="${GOPATH//://bin:}/bin:${PATH}"
-
-    return 0
   fi
-
-  return 1
 }
 
 args=`getopt x $*`

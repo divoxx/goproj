@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 VERSION="0.1.0"
 
@@ -10,20 +11,23 @@ Simplify Go(lang) development by providing a set of tools built around the
 original go tool.
 
 Commands:
-
+    init    Print a shell setup you can append to your ~/.bashrc or ~/.bash_profile
     new     Creates a new project structure.
     run     Run the a given command with GOPATH set to the project directory.
 
 Examples:
-
     goproj new
 
 EOF
 }
 
+prefix() {
+    local dir=$(cd -P "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)
+    echo $dir
+}
+
 libexec() {
-  local dir=$(cd -P "$(dirname "${BASH_SOURCE[0]}")/../libexec" && pwd)
-  echo "${dir}"
+  echo "$(prefix)/libexec"
 }
 
 run() {
@@ -38,7 +42,7 @@ run() {
 
     if which $bin > /dev/null; then
       shift
-      $bin $@
+      env GOPROJ_PREFIX="$(prefix)" $bin $@
     else
       echo -e "Invalid command: ${cmd}\n"
       usage
