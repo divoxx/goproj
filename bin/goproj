@@ -1,126 +1,54 @@
-#!/bin/bash -i
+#!/bin/bash
+set -e
 
 VERSION="0.1.0"
 
-show_help() {
-  echo "Usage: $(basename ${0}) [options] [--] COMMAND"
-  echo ""
-  echo "Options:"
-  echo "  -h    show this screen"
-  echo "  -x    set GOPATH strictly to your project path, not keeping the original"
-  echo "  -s    open a new shell with the environment setup to the project"
-  echo "  -v    show the version"
-  echo ""
-  echo "Description:"
-  echo ""
-  echo "  Search for a .goproj file up in the directory tree. If one is found, prepend"
-  echo "  it's directory to the GOPATH env variable and execute COMMAND."
-  echo ""
-  echo "  If no .goproj file is found, it stops when it reaches the root folder, and"
-  echo "  executes COMMAND"
-  echo ""
-  echo "Examples:"
-  echo ""
-  echo "  goproj godoc -http=:6060"
-  echo "  goproj -s"
-  echo ""
-  echo "Go tool wrapper:"
-  echo ""
-  echo "  goproj comes with the goproj-go executable, which wraps the go tool, setting up"
-  echo "  the environment prior to actually executing the toolchain command."
-  echo ""
-  echo "  To take full advantage of it, it's recommended to alias the \"go\" command to it:"
-  echo ""
-  echo "    alias go=\"goproj-go\""
-  echo ""
-  echo "  After setting the alias, one can simply do:"
-  echo ""
-  echo "    go build -a -n"
-  echo ""
-  echo "  And it will in fact execute:"
-  echo ""
-  echo "    goproj -- go build -a -n"
-  echo ""
+usage() {
+  cat <<EOF
+Usage: goproj COMMAND [options*]
+
+Simplify Go(lang) development by providing a set of tools built around the
+original go tool.
+
+Commands:
+    init    Print a shell setup you can append to your ~/.bashrc or ~/.bash_profile
+    new     Creates a new project structure.
+    run     Run the a given command with GOPATH set to the project directory.
+
+Examples:
+    goproj new
+
+EOF
 }
 
-locate_goproj_dir() {
-  local dir="$(pwd)"
-
-  while [[ $dir != "/" ]]; do
-    if [[ -e "${dir}/.goproj" ]]; then
-      echo -n "${dir}"
-      return 0
-    fi
-
-    dir=$(dirname "${dir}")
-  done
-
-  return 1
+prefix() {
+    local dir=$(cd -P "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)
+    echo $dir
 }
 
-setup_env() {
-  local goproj_path=$(locate_goproj_dir)
-
-  if [[ -n $goproj_path ]]; then
-    local goproj_name=$(basename ${goproj_path})
-    PS1="\[\033[1;36m\]goproj:${goproj_name}\[\033[0m\] ${PS1}"
-
-    if [[ $EXCLUSIVE ]]; then
-      GOPATH="${goproj_path}"
-    else  
-      GOPATH="${goproj_path}:${GOPATH}"
-    fi
-
-    PATH="${GOPATH//://bin:}/bin:${PATH}"
-
-    return 0
-  fi
-
-  return 1
+libexec() {
+  echo "$(prefix)/libexec"
 }
 
-while getopts ":hxsv" opt; do
-  case $opt in
-  "h")
-    show_help
-    exit 1
-    ;;
-  "x")
-    EXCLUSIVE=true
-    ;;
-  "s")
-    RUN_SHELL=true
-    ;;
-  "v")
-    echo $VERSION
+run() {
+  local cmd="${1}"
+
+  if [[ ! $cmd ]]; then
+    usage
     exit 0
-    ;;
-  ?)
-    echo "Err: Invalid option ${OPTARG}."
-    echo ""
-    show_help
-    exit 1
-    ;;
-  esac
-done
+  else
+    local bin="$(basename $0)-${cmd}"
+    PATH="$(libexec):${PATH}"
 
-shift $(( OPTIND - 1 ));
-
-setup_env
-
-if [[ $RUN_SHELL ]]; then
-  if [[ $? -ne 0 ]]; then
-    echo "No .goproj found, not starting shell"
+    if which $bin > /dev/null; then
+      shift
+      env GOPROJ_PREFIX="$(prefix)" $bin $@
+    else
+      echo -e "Invalid command: ${cmd}\n"
+      usage
+      exit 1
+    fi
   fi
+}
 
-  ${SHELL} $@
-  exit $?
-fi
-
-if [[ -n $@ ]]; then
-  $@
-  exit $?
-fi
-
-show_help
-exit 1
+run $@

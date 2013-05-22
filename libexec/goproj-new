@@ -1,0 +1,36 @@
+#!/bin/bash -i
+set -e
+
+usage() {
+  cat <<EOF
+Usage: goproj new [options] <directory> [package]
+
+Setup Go(lang) workspace in the current directory.
+
+Example:
+    goproj new foo
+    goproj new foo example.com/pkg/repos
+
+EOF
+}
+
+dir=$1
+pkg=$2
+
+if [[ -z $dir ]]; then
+  usage
+  exit 0
+fi
+
+if [[ -e $dir && ! -d $dir ]]; then
+  echo "${dir} exists but it's not a directory"
+  usage
+  exit 3
+fi
+
+mkdir -p ${dir}/{src,bin,pkg}
+touch ${dir}/.goproj
+
+if [[ $pkg ]]; then
+  mkdir -p ${dir}/src/${pkg}
+fi

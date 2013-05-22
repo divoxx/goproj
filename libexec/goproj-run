@@ -1,0 +1,96 @@
+#!/bin/bash -i
+set -e
+
+usage() {
+  cat <<EOF
+Usage: goproj run [options] <command>
+
+Setup Go(lang) environment variables for your project prior to execute the given command.
+
+Options:
+    -x  Set GOPATH exclusively to your project path, reseting it instead of prepending to it
+
+How it works:
+    Search for a .goproj file up in the directory tree. If one is found, prepend
+    it's directory to the GOPATH env variable and execute COMMAND.
+
+    If no .goproj file is found, it stops when it reaches the root folder, and
+    executes COMMAND
+
+Examples:
+    goproj run godoc -http=:6060
+
+Pro Tip:
+    You can use an alias trick to make wrap the go tool to always use goproj to setup env variables
+    for your project.
+
+        alias go="goproj run -- go"
+
+    After setting the alias, one can simply do:
+
+        go build -a -n
+
+    And it will in fact execute:
+
+        goproj run -- go build -a -n
+
+EOF
+}
+
+# options
+opt_x=false
+
+locate_goproj_dir() {
+  local dir="$(pwd)"
+
+  while [[ $dir != "/" ]]; do
+    if [[ -e "${dir}/.goproj" ]]; then
+      echo -n "${dir}"
+      return 0
+    fi
+
+    dir=$(dirname "${dir}")
+  done
+
+  return 1
+}
+
+setup_env() {
+  local goproj_path=$(locate_goproj_dir)
+
+  if [[ -n $goproj_path ]]; then
+    if [[ $opt_h ]]; then
+      GOPATH="${goproj_path}"
+    else
+      GOPATH="${goproj_path}:${GOPATH}"
+    fi
+
+    PATH="${GOPATH//://bin:}/bin:${PATH}"
+  fi
+}
+
+args=`getopt x $*`
+if [ $? != 0 ]
+then
+  usage
+  exit 2
+fi
+
+set -- $args
+
+for i; do
+  case "${i}" in
+  "-x")
+    opt_x=true; shift;;
+  "--")
+    shift; break;;
+  esac
+done
+
+if [[ -z $@ ]]; then
+  usage
+  exit 0
+fi
+
+setup_env
+$@
