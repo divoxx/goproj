@@ -66,12 +66,12 @@ setup_env() {
     PS1="\[\033[1;36m\]goproj:${goproj_name}\[\033[0m\] ${PS1}"
 
     if [[ $EXCLUSIVE ]]; then
-      GOPATH="${goproj_path}"
+      export GOPATH="${goproj_path}"
     else  
-      GOPATH="${goproj_path}:${GOPATH}"
+      export GOPATH="${goproj_path}:${GOPATH}"
     fi
 
-    PATH="${GOPATH//://bin:}/bin:${PATH}"
+    export PATH="${GOPATH//://bin:}/bin:${PATH}"
 
     return 0
   fi
