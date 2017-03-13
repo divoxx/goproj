@@ -1,6 +1,8 @@
 GoProj
 ======
 
+*IMPORTANT: This project is not being maintained anymore*
+
 GoProj makes it easier to manage project-specific GOPATH entries. It looks for a .goproj
 file up in the directory tree and if it finds one, prepends the file location to the GOPATH
 environment variable.
