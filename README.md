@@ -105,6 +105,16 @@ Go tool wrapper:
     goproj -- go build -a -n
 ```
 
+### Vim
+
+To use goproj with vim and the go-vim plugin, vim must be set to use an interactive bash shell. Add the following to your vimrc:
+
+```
+set shell=/bin/bash\ -i " Allow bash aliases
+```
+
+In order for goproj-go to correctly recognize the workspace, vim's working directory must be set to the directory containing the ```.goproj```.
+
 License
 -------
 
